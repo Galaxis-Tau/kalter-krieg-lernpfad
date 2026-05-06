@@ -1,0 +1,860 @@
+<!DOCTYPE html>
+<html lang="de">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Kalter Krieg - Lernpfad</title>
+<style>
+*,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
+:root{
+  --bg:#08111d;
+  --panel:#0e1b2a;
+  --panel2:#111f30;
+  --line:#24445d;
+  --cyan:#50d9ff;
+  --red:#ff5a68;
+  --amber:#ffd166;
+  --green:#64d98a;
+  --text:#eef7ff;
+  --muted:#9bb1c3;
+  --paper:#f7f3ea;
+  --ink:#18202a;
+}
+body{
+  font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,Helvetica,Arial,sans-serif;
+  background:
+    radial-gradient(circle at 24% 18%,rgba(80,217,255,.18),transparent 34%),
+    radial-gradient(circle at 82% 22%,rgba(255,90,104,.16),transparent 30%),
+    linear-gradient(135deg,#050914 0%,#08111d 48%,#150d12 100%);
+  color:var(--text);
+  min-height:100vh;
+  line-height:1.55;
+}
+body::before{
+  content:"";
+  position:fixed;
+  inset:0;
+  pointer-events:none;
+  background-image:
+    linear-gradient(rgba(80,217,255,.08) 1px,transparent 1px),
+    linear-gradient(90deg,rgba(255,90,104,.06) 1px,transparent 1px);
+  background-size:64px 64px;
+  mask-image:linear-gradient(to bottom,rgba(0,0,0,.8),rgba(0,0,0,.2));
+}
+a{color:inherit}
+button{font:inherit}
+.wrap{width:min(1180px,calc(100% - 32px));margin:0 auto;padding:22px 0 40px;position:relative}
+.top{
+  display:flex;
+  align-items:center;
+  justify-content:space-between;
+  gap:16px;
+  border-bottom:1px solid rgba(155,177,195,.25);
+  padding-bottom:14px;
+  margin-bottom:22px;
+}
+.brand{font-family:"Courier New",monospace;font-size:12px;color:var(--muted);letter-spacing:1.6px;text-transform:uppercase}
+.status{display:flex;align-items:center;gap:8px;color:#b9d5e8;font-size:13px}
+.dot{width:9px;height:9px;border-radius:50%;background:var(--green);box-shadow:0 0 14px var(--green)}
+.hero{
+  display:grid;
+  grid-template-columns:minmax(0,1fr) minmax(330px,470px);
+  gap:28px;
+  align-items:stretch;
+  min-height:420px;
+  margin-bottom:24px;
+}
+.headline{
+  padding:34px 0 20px;
+  display:flex;
+  flex-direction:column;
+  justify-content:center;
+}
+.eyebrow{font-family:"Courier New",monospace;color:var(--cyan);font-size:13px;letter-spacing:2px;text-transform:uppercase;margin-bottom:14px}
+h1{font-size:clamp(34px,5vw,68px);line-height:1.02;letter-spacing:0;font-weight:800;max-width:820px;text-shadow:0 0 26px rgba(80,217,255,.28)}
+.lead{font-size:18px;color:#c7d6e3;max-width:700px;margin-top:18px}
+.hero-actions{display:flex;flex-wrap:wrap;gap:10px;margin-top:24px}
+.btn{
+  border:1px solid rgba(80,217,255,.5);
+  color:var(--text);
+  background:rgba(80,217,255,.09);
+  padding:12px 15px;
+  border-radius:8px;
+  cursor:pointer;
+  text-decoration:none;
+  display:inline-flex;
+  align-items:center;
+  gap:8px;
+}
+.btn:hover{background:rgba(80,217,255,.16)}
+.btn.red{border-color:rgba(255,90,104,.55);background:rgba(255,90,104,.09)}
+.radar{
+  position:relative;
+  min-height:360px;
+  border:1px solid rgba(80,217,255,.28);
+  background:
+    radial-gradient(circle at center,rgba(80,217,255,.16) 0 1px,transparent 2px),
+    repeating-radial-gradient(circle at center,transparent 0 54px,rgba(80,217,255,.25) 55px 56px),
+    linear-gradient(135deg,rgba(13,37,58,.76),rgba(30,13,21,.74));
+  border-radius:10px;
+  overflow:hidden;
+  box-shadow:0 0 34px rgba(80,217,255,.12),inset 0 0 42px rgba(80,217,255,.08);
+}
+.world-map{
+  position:absolute;
+  inset:52px 20px 42px;
+  width:calc(100% - 40px);
+  height:calc(100% - 94px);
+  object-fit:contain;
+  opacity:.42;
+  filter:invert(1) sepia(1) saturate(3) hue-rotate(145deg) drop-shadow(0 0 16px rgba(80,217,255,.55));
+  mix-blend-mode:screen;
+}
+.radar::before,.radar::after{content:"";position:absolute;inset:0;pointer-events:none}
+.radar::before{
+  background:conic-gradient(from 260deg,rgba(80,217,255,.28),transparent 72deg);
+  transform-origin:center;
+  animation:sweep 8s linear infinite;
+}
+.radar::after{
+  background:
+    linear-gradient(90deg,transparent 49.8%,rgba(80,217,255,.3) 50%,transparent 50.2%),
+    linear-gradient(transparent 49.8%,rgba(255,90,104,.28) 50%,transparent 50.2%);
+}
+@keyframes sweep{to{transform:rotate(360deg)}}
+.map-title{position:absolute;left:18px;top:18px;font-family:"Courier New",monospace;color:#c8f4ff;font-size:12px;letter-spacing:1.5px;text-transform:uppercase}
+.marker{
+  position:absolute;
+  width:42px;
+  height:42px;
+  border:2px solid var(--red);
+  border-radius:50%;
+  box-shadow:0 0 20px rgba(255,90,104,.8);
+}
+.marker::before,.marker::after{content:"";position:absolute;background:var(--red);left:50%;top:50%;transform:translate(-50%,-50%)}
+.marker::before{width:58px;height:2px}.marker::after{width:2px;height:58px}
+.m-korea{left:73%;top:34%}.m-cuba{left:25%;top:48%}.m-vietnam{left:71%;top:58%}.m-afghan{left:62%;top:44%}.m-grenada{left:27%;top:51%}.m-africa{left:52%;top:61%;border-color:var(--cyan);box-shadow:0 0 18px rgba(80,217,255,.8)}.m-africa::before,.m-africa::after{background:var(--cyan)}
+.tag{
+  position:absolute;
+  border:1px solid rgba(80,217,255,.58);
+  background:rgba(5,12,22,.72);
+  padding:8px 10px;
+  border-radius:7px;
+  color:#dff8ff;
+  font-size:12px;
+  max-width:148px;
+}
+.tag.red{border-color:rgba(255,90,104,.65)}
+.t-korea{left:61%;top:18%}.t-cuba{left:7%;top:62%}.t-vietnam{left:61%;bottom:36px}.t-afghan{left:50%;top:31%}.t-grenada{left:31%;top:39%}.t-africa{left:39%;bottom:28px}
+.grid{
+  display:grid;
+  grid-template-columns:320px minmax(0,1fr);
+  gap:18px;
+  align-items:start;
+}
+.tile,.game-panel,.source-panel{
+  border:1px solid rgba(155,177,195,.22);
+  background:rgba(10,24,38,.82);
+  border-radius:10px;
+  box-shadow:0 16px 32px rgba(0,0,0,.22);
+}
+.tile{padding:16px;text-decoration:none;display:block;margin-bottom:14px}
+.tile h2{font-size:20px;line-height:1.2;margin-bottom:8px}
+.tile p{color:#b9c9d6;font-size:14px}
+.tile .meta{font-family:"Courier New",monospace;color:var(--cyan);font-size:11px;letter-spacing:1.2px;text-transform:uppercase;margin-bottom:10px}
+.tile.red .meta{color:var(--red)}
+.tile:hover{border-color:rgba(80,217,255,.55);background:rgba(13,34,52,.9)}
+.assignment{
+  border:1px solid rgba(255,209,102,.36);
+  background:rgba(255,209,102,.08);
+  border-radius:10px;
+  padding:16px;
+  margin-bottom:18px;
+  box-shadow:0 16px 32px rgba(0,0,0,.18);
+}
+.assignment h2{font-size:22px;margin-bottom:8px}
+.assignment p{color:#f2dfaa;font-size:15px}
+.conflict-list{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:12px}
+.conflict-card{
+  min-height:132px;
+  border:1px solid rgba(155,177,195,.22);
+  background:linear-gradient(150deg,rgba(18,39,59,.95),rgba(15,22,34,.9));
+  border-radius:8px;
+  padding:14px;
+  cursor:pointer;
+  color:var(--text);
+  text-align:left;
+}
+.conflict-card:hover{border-color:rgba(255,209,102,.6)}
+.conflict-card strong{display:block;font-size:17px;margin-bottom:6px}
+.conflict-card span{display:block;color:#b9c9d6;font-size:13px}
+.conflict-card .side{font-family:"Courier New",monospace;color:var(--amber);font-size:11px;text-transform:uppercase;letter-spacing:1.2px;margin-bottom:8px}
+.game-panel{padding:18px;min-height:420px}
+.screen{display:none}.screen.on{display:block}
+.pb-wrap{margin:14px 0 16px}.pb-label{display:flex;justify-content:space-between;color:var(--muted);font-family:"Courier New",monospace;font-size:12px;margin-bottom:6px}.pb{height:4px;background:rgba(155,177,195,.23);border-radius:99px;overflow:hidden}.pb-fill{height:100%;background:linear-gradient(90deg,var(--cyan),var(--red));width:0;transition:width .25s ease}
+.doc{
+  background:var(--paper);
+  color:var(--ink);
+  border:1px solid #d8d0c2;
+  border-radius:8px;
+  padding:15px;
+  font-family:"Courier New",monospace;
+  font-size:13px;
+  line-height:1.75;
+  margin:12px 0;
+}
+.doc-meta{display:flex;justify-content:space-between;gap:12px;color:#6c7075;font-size:11px;border-bottom:1px solid #ded6c8;padding-bottom:8px;margin-bottom:10px}
+.stamp{border:1px solid #b91c1c;color:#b91c1c;padding:2px 6px;white-space:nowrap;letter-spacing:1px}
+.image-card{
+  display:none;
+  margin:12px 0;
+  border:1px solid rgba(155,177,195,.22);
+  background:rgba(255,255,255,.05);
+  border-radius:8px;
+  overflow:hidden;
+}
+.image-card.on{display:block}
+.image-card img{display:block;width:100%;height:260px;object-fit:contain;object-position:center;background:#07111d}
+.caption{font-size:12px;color:#b9c9d6;padding:8px 10px;border-top:1px solid rgba(155,177,195,.18)}
+.caption a{color:#dff8ff}
+.qbox{background:rgba(255,255,255,.06);border-left:3px solid var(--cyan);border-radius:0 8px 8px 0;padding:13px 14px;margin:12px 0;color:#e8f4ff}
+.choices{display:grid;gap:8px}
+.cbtn{
+  width:100%;
+  text-align:left;
+  border:1px solid rgba(155,177,195,.28);
+  background:rgba(255,255,255,.05);
+  color:var(--text);
+  border-radius:8px;
+  padding:12px 13px;
+  cursor:pointer;
+  line-height:1.45;
+}
+.cbtn:hover:not([disabled]){border-color:rgba(80,217,255,.62);background:rgba(80,217,255,.09)}
+.cbtn[disabled]{cursor:default}.cbtn.ok{border-color:rgba(100,217,138,.85);background:rgba(100,217,138,.13)}.cbtn.no{border-color:rgba(255,90,104,.85);background:rgba(255,90,104,.14)}
+.fb{display:none;margin:12px 0;border-left:3px solid rgba(155,177,195,.35);padding:12px 14px;font-size:14px;border-radius:0 8px 8px 0}.fb.on{display:block}.fb.ok{border-color:var(--green);background:rgba(100,217,138,.12)}.fb.no{border-color:var(--red);background:rgba(255,90,104,.12)}
+.next{display:none;width:100%;margin-top:10px;border:0;background:var(--text);color:#08111d;border-radius:8px;padding:13px;cursor:pointer;font-weight:700}.next.on{display:block}
+.small-btn{margin-top:10px;border:1px solid rgba(155,177,195,.34);background:transparent;color:var(--text);border-radius:8px;padding:10px 12px;cursor:pointer}
+.result{background:rgba(255,255,255,.06);border:1px solid rgba(155,177,195,.22);border-radius:8px;padding:14px;margin:12px 0}
+.result strong{display:block;margin-bottom:6px}
+.source-panel{padding:14px;margin-top:18px;color:#b9c9d6;font-size:12px}
+.source-panel a{color:#dff8ff}
+@media (max-width:860px){
+  .hero,.grid{grid-template-columns:1fr}
+  .headline{padding-top:12px}
+  .conflict-list{grid-template-columns:1fr}
+  .radar{min-height:310px}
+  .image-card img{height:220px}
+}
+@media (max-width:520px){
+  .wrap{width:min(100% - 22px,1180px);padding-top:14px}
+  .top{align-items:flex-start;flex-direction:column}
+  .hero-actions{flex-direction:column}.btn{justify-content:center}
+  .tag{font-size:11px;max-width:124px}
+}
+</style>
+</head>
+<body>
+<main class="wrap">
+  <header class="top">
+    <div class="brand">Lernpfad Geschichte 10 - Kalter Krieg</div>
+    <div class="status"><span class="dot"></span><span>Unterrichtsmodus: 1 Stunde</span></div>
+  </header>
+
+  <section class="hero">
+    <div class="headline">
+      <div class="eyebrow">Globale Auswirkungen</div>
+      <h1>Kalter Krieg: Entscheidungen unter Druck</h1>
+      <p class="lead">In Europa blieb der Krieg zwischen den Supermächten kalt. In Korea, Kuba, Vietnam, Afghanistan, Grenada und vielen neuen Staaten in Asien und Afrika wurde er gefährlich konkret.</p>
+      <div class="hero-actions">
+        <a class="btn red" href="IM_Rennfahrer_Lernspiel.html">IM Rennfahrer öffnen</a>
+        <button class="btn" onclick="scrollToGames()">Entscheidungsspiele starten</button>
+      </div>
+    </div>
+    <div class="radar" aria-label="Stilisierte Weltkarte mit Konfliktpunkten">
+      <div class="map-title">Konfliktkarte</div>
+      <img class="world-map" src="https://commons.wikimedia.org/wiki/Special:FilePath/BlankMap-World.svg" alt="">
+      <div class="marker m-korea"></div><div class="tag t-korea">Korea 1950-1953</div>
+      <div class="marker m-cuba"></div><div class="tag t-cuba">Kuba 1962</div>
+      <div class="marker m-vietnam"></div><div class="tag red t-vietnam">Vietnam</div>
+      <div class="marker m-afghan"></div><div class="tag red t-afghan">Afghanistan 1979-1989</div>
+      <div class="marker m-grenada"></div><div class="tag red t-grenada">Grenada 1983</div>
+      <div class="marker m-africa"></div><div class="tag t-africa">Dekolonisierung</div>
+    </div>
+  </section>
+
+  <section class="grid" id="games">
+    <aside>
+      <a class="tile red" href="IM_Rennfahrer_Lernspiel.html">
+        <div class="meta">Spionage</div>
+        <h2>IM „Rennfahrer“</h2>
+        <p>Fertiges Lernspiel zu einem Stasi-Mitarbeiter und echten Akten. Diese Kachel führt direkt zur vorhandenen Datei.</p>
+      </a>
+      <div class="tile">
+        <div class="meta">Leitfrage</div>
+        <h2>Warum eingreifen?</h2>
+        <p>Die Spiele zeigen reale Optionen von Regierungen. Nach jeder Wahl erfährst du, welche Entscheidung tatsächlich getroffen wurde.</p>
+      </div>
+    </aside>
+
+    <section class="game-panel">
+      <div class="assignment">
+        <h2>Zentraler Arbeitsauftrag</h2>
+        <p>Vergleicht am Ende: Wie enden die verschiedenen Konfliktfelder des „heißen“ Kalten Krieges? Achtet darauf, ob es einen Sieg, einen Waffenstillstand, einen Kompromiss, einen Rückzug oder eine offene Folge gibt.</p>
+      </div>
+      <div id="menu" class="screen on">
+        <div class="eyebrow">Entscheidungsbaum</div>
+        <h2>Wähle einen Konflikt</h2>
+        <p style="color:#c7d6e3;margin:8px 0 16px">Du spielst nicht „richtig oder falsch“, sondern denkst wie eine Regierung im Kalten Krieg: Angst vor Machtverlust, Angst vor Atomkrieg, Angst vor Gesichtsverlust.</p>
+        <div class="conflict-list" id="conflictList"></div>
+      </div>
+
+      <div id="play" class="screen">
+        <button class="small-btn" onclick="showMenu()">Zurück zur Auswahl</button>
+        <div class="pb-wrap">
+          <div class="pb-label"><span id="stepLabel">Schritt</span><span id="scoreLabel">0 / 0</span></div>
+          <div class="pb"><div class="pb-fill" id="bar"></div></div>
+        </div>
+        <div id="caseMeta" class="eyebrow"></div>
+        <h2 id="caseTitle"></h2>
+        <div class="doc">
+          <div class="doc-meta"><span id="docDate"></span><span class="stamp">ENTSCHEIDUNG</span></div>
+          <div id="docText"></div>
+        </div>
+        <figure class="image-card" id="imageCard">
+          <img id="stepImage" alt="">
+          <figcaption class="caption" id="imageCaption"></figcaption>
+        </figure>
+        <div class="qbox" id="question"></div>
+        <div class="choices" id="choices"></div>
+        <div class="fb" id="feedback"></div>
+        <button class="next" id="nextBtn" onclick="nextStep()">Weiter</button>
+      </div>
+
+      <div id="end" class="screen">
+        <button class="small-btn" onclick="showMenu()">Zurück zur Auswahl</button>
+        <div class="result">
+          <strong id="endTitle"></strong>
+          <p id="endText"></p>
+        </div>
+        <button class="btn" id="againBtn">Noch einmal spielen</button>
+      </div>
+    </section>
+  </section>
+
+  <footer class="source-panel">
+    Quellenbasis für die historischen Entscheidungen: Office of the Historian, U.S. Department of State:
+    <a href="https://history.state.gov/milestones/1961-1968/cuban-missile-crisis">Kubakrise</a>,
+    <a href="https://history.state.gov/milestones/1961-1968/gulf-of-tonkin">Vietnam/Golf von Tonkin</a>,
+    <a href="https://history.state.gov/historicaldocuments/frus1950v07/d909">Korea/Atombombenfrage</a>,
+    <a href="https://history.state.gov/historicaldocuments/frus1951v07p1/d229">Truman und MacArthur</a>,
+    <a href="https://history.state.gov/milestones/1945-1952/asia-and-africa">Dekolonisierung</a>,
+    <a href="https://history.state.gov/milestones/1977-1980/soviet-invasion-afghanistan">Afghanistan</a>,
+    <a href="https://history.army.mil/Publications/Publications-Catalog/Operation-URGENT-FURY/">Grenada</a>.
+    Bildquellen: <a href="https://commons.wikimedia.org/wiki/File:BlankMap-World.svg">Weltkarte</a>,
+    <a href="https://commons.wikimedia.org/wiki/File:Truman_and_MacArthur.JPG">Truman/MacArthur</a>,
+    <a href="https://commons.wikimedia.org/wiki/File:The_Cuba_Missile_Crisis.jpg">Kubakrise/ExComm</a>,
+    <a href="https://commons.wikimedia.org/wiki/File:Napalm.jpg">Napalm</a>,
+    <a href="https://commons.wikimedia.org/wiki/File:US-Huey-helicopter-spraying-Agent-Orange-in-Vietnam.jpg">Agent Orange</a>,
+    <a href="https://commons.wikimedia.org/wiki/File:Plenary_session_during_the_Bandung_Conference.png">Bandung-Konferenz</a>,
+    <a href="https://commons.wikimedia.org/wiki/File:SovietInvasionAfghanistanMap.png">Afghanistan-Karte</a>,
+    <a href="https://commons.wikimedia.org/wiki/File:Operation_Urgent_Fury,_Grenada,_1983_(10470086845).jpg">Operation Urgent Fury</a>.
+  </footer>
+</main>
+
+<script>
+var img={
+  korea:{src:"https://commons.wikimedia.org/wiki/Special:FilePath/Truman_and_MacArthur.JPG?width=900",alt:"Harry S. Truman und Douglas MacArthur auf Wake Island 1950",caption:"Harry S. Truman und Douglas MacArthur, Wake Island 1950. Wikimedia Commons / U.S. Government.",link:"https://commons.wikimedia.org/wiki/File:Truman_and_MacArthur.JPG"},
+  cuba:{src:"https://commons.wikimedia.org/wiki/Special:FilePath/The_Cuba_Missile_Crisis.jpg?width=1000",alt:"John F. Kennedy mit Beratern während der Kubakrise",caption:"John F. Kennedy mit dem ExComm während der Kubakrise. Wikimedia Commons / John F. Kennedy Presidential Library.",link:"https://commons.wikimedia.org/wiki/File:The_Cuba_Missile_Crisis.jpg"},
+  vietnam:{src:"https://commons.wikimedia.org/wiki/Special:FilePath/Napalm.jpg?width=900",alt:"Napalm-Explosion im Vietnamkrieg",caption:"Napalm-Einsatz im Vietnamkrieg. Wikimedia Commons / National Archives.",link:"https://commons.wikimedia.org/wiki/File:Napalm.jpg"},
+  orange:{src:"https://commons.wikimedia.org/wiki/Special:FilePath/US-Huey-helicopter-spraying-Agent-Orange-in-Vietnam.jpg?width=900",alt:"US-Hubschrauber versprüht Agent Orange in Vietnam",caption:"US-Hubschrauber versprüht Agent Orange. Wikimedia Commons / U.S. Army.",link:"https://commons.wikimedia.org/wiki/File:US-Huey-helicopter-spraying-Agent-Orange-in-Vietnam.jpg"},
+  bandung:{src:"https://commons.wikimedia.org/wiki/Special:FilePath/Plenary_session_during_the_Bandung_Conference.png?width=1000",alt:"Plenarsitzung der Bandung-Konferenz 1955",caption:"Plenarsitzung der Bandung-Konferenz 1955. Wikimedia Commons / Foreign Ministry of Indonesia.",link:"https://commons.wikimedia.org/wiki/File:Plenary_session_during_the_Bandung_Conference.png"},
+  afghan:{src:"https://commons.wikimedia.org/wiki/Special:FilePath/SovietInvasionAfghanistanMap.png?width=900",alt:"Karte des sowjetischen Einmarschs in Afghanistan",caption:"Karte des sowjetischen Einmarschs in Afghanistan 1979. Wikimedia Commons.",link:"https://commons.wikimedia.org/wiki/File:SovietInvasionAfghanistanMap.png"},
+  grenada:{src:"https://commons.wikimedia.org/wiki/Special:FilePath/Operation_Urgent_Fury,_Grenada,_1983_(10470086845).jpg?width=900",alt:"Darstellung zu Operation Urgent Fury in Grenada",caption:"Operation Urgent Fury, Grenada 1983. Wikimedia Commons / Gary Todd, CC0.",link:"https://commons.wikimedia.org/wiki/File:Operation_Urgent_Fury,_Grenada,_1983_(10470086845).jpg"}
+};
+var games=[
+  {
+    id:"korea",
+    title:"Koreakrieg",
+    years:"1950-1953",
+    side:"USA / Vereinte Nationen",
+    summary:"US-Präsident Harry S. Truman muss entscheiden, wie weit die USA in Korea gehen.",
+    end:"Die USA führten einen begrenzten Krieg. General MacArthur wurde entlassen. Der Koreakrieg endete 1953 mit einem Waffenstillstand, nicht mit einem Friedensvertrag. Korea blieb geteilt.",
+    steps:[
+      {
+        title:"Nordkorea greift an",
+        meta:"Amerikanische Entscheidung",
+        date:"Washington, Juni 1950",
+        doc:"Nordkorea wird von einer kommunistischen Regierung geführt. Es greift Südkorea an. US-Präsident Harry S. Truman, der amerikanische Regierungschef, sieht darin einen klaren Anlass für Containment: Die Ausbreitung des Kommunismus soll gestoppt werden.",
+        image:img.korea,
+        q:"Welche Option hatte die amerikanische Regierung?",
+        choices:[
+          {t:"A) Keine Soldaten schicken. Südkorea soll allein kämpfen.",real:false,fb:"Das wäre möglich gewesen. Truman fürchtete aber, dass dann weitere Staaten unter kommunistischen Druck geraten."},
+          {t:"B) Unter dem Dach der Vereinten Nationen Truppen schicken.",real:true,fb:"Das geschah. Die USA führten eine UN-Truppe an. Offiziell ging es darum, den Angriff Nordkoreas zurückzudrängen und die Ausbreitung des Kommunismus einzudämmen."},
+          {t:"C) Sofort die Sowjetunion direkt angreifen.",real:false,fb:"Das hätte den Krieg wahrscheinlich stark ausgeweitet. Die USA vermieden den direkten Krieg gegen die Sowjetunion."}
+        ]
+      },
+      {
+        title:"China greift ein",
+        meta:"Amerikanische Entscheidung",
+        date:"Washington, November 1950",
+        doc:"Die UN-Truppen rücken weit nach Norden vor. Chinesische Soldaten greifen ein. Der amerikanische General Douglas MacArthur fordert härtere Schritte gegen China.",
+        image:img.korea,
+        q:"MacArthur will den Krieg ausweiten. Auch der Einsatz von Atomwaffen gegen chinesische Ziele wird öffentlich und intern als Möglichkeit diskutiert. Wie weit soll die amerikanische Regierung gehen?",
+        choices:[
+          {t:"A) Den Krieg begrenzen und keine Ausweitung nach China zulassen.",real:true,fb:"Das war Trumans Linie. Er wollte Korea verteidigen, aber keinen dritten Weltkrieg riskieren."},
+          {t:"B) Chinesische Ziele angreifen und den Krieg ausweiten.",real:false,fb:"MacArthur wollte stärker gegen China vorgehen. Truman lehnte das ab, weil er einen größeren Krieg fürchtete."},
+          {t:"C) Atomwaffen gegen chinesische Ziele einsetzen.",real:false,fb:"MacArthur wollte sehr harte Schritte. Die Atombombe wurde als Möglichkeit diskutiert. Truman entschied sich dagegen, weil ein Atomkrieg und ein Krieg mit China oder der Sowjetunion drohten."}
+        ]
+      },
+      {
+        title:"Streit mit MacArthur",
+        meta:"Amerikanische Entscheidung",
+        date:"Washington, April 1951",
+        doc:"General Douglas MacArthur, ein amerikanischer Oberbefehlshaber, widerspricht öffentlich der Linie von Präsident Truman. In einer Demokratie entscheidet aber die gewählte Regierung über Kriegspolitik.",
+        image:img.korea,
+        q:"Was tut Truman?",
+        choices:[
+          {t:"A) MacArthur entlassen und am begrenzten Krieg festhalten.",real:true,fb:"Genau das tat Truman. Er entließ MacArthur. Die Botschaft war: Das Militär folgt der zivilen Regierung."},
+          {t:"B) MacArthur freie Hand geben.",real:false,fb:"Das hätte die Ausweitung des Kriegs wahrscheinlicher gemacht. Truman wollte diese Kontrolle nicht abgeben."},
+          {t:"C) Alle Truppen sofort abziehen.",real:false,fb:"Das hätte Südkorea geschwächt. Die USA blieben im Krieg, aber mit begrenztem Ziel."}
+        ]
+      },
+      {
+        title:"Friedensverhandlungen",
+        meta:"Amerikanische und kommunistische Entscheidung",
+        date:"Panmunjom, 1951-1953",
+        doc:"Der Krieg ist festgefahren. Keine Seite kann leicht gewinnen. Gleichzeitig sterben weiter Soldaten und Zivilisten. Verhandlungen beginnen, dauern aber lange.",
+        image:img.korea,
+        q:"Womit endet der Koreakrieg?",
+        choices:[
+          {t:"Ein Waffenstillstand wird unterschrieben. Korea bleibt geteilt.",real:true,fb:"So endete der Krieg 1953. Es gab keinen Friedensvertrag. Nordkorea und Südkorea blieben getrennt."},
+          {t:"Die USA erobern ganz Nordkorea.",real:false,fb:"Das geschah nicht. Nach dem chinesischen Eingreifen war ein vollständiger Sieg nicht erreichbar, ohne den Krieg stark auszuweiten."},
+          {t:"Nordkorea erobert ganz Südkorea.",real:false,fb:"Auch das geschah nicht. Die Front stabilisierte sich ungefähr dort, wo Korea bis heute geteilt ist."}
+        ]
+      }
+    ]
+  },
+  {
+    id:"cuba",
+    title:"Kubakrise",
+    years:"1962",
+    side:"USA und Sowjetunion",
+    summary:"US-Präsident John F. Kennedy und der sowjetische Regierungschef Nikita Chruschtschow stehen am Rand eines Atomkriegs.",
+    end:"Kennedy wählte die Seeblockade, genannt Quarantäne. Chruschtschow zog die sowjetischen Raketen aus Kuba ab. Die USA versprachen öffentlich, Kuba nicht anzugreifen. Gleichzeitig wurden später auch amerikanische Mittelstreckenraketen aus der Türkei entfernt.",
+    steps:[
+      {
+        title:"Sowjetische Raketen auf Kuba",
+        meta:"Sowjetische Entscheidung",
+        date:"Moskau / Havanna, 1962",
+        doc:"Kuba liegt nahe an den USA. Nikita Chruschtschow, sowjetischer Regierungschef, will die kommunistische Regierung Kubas schützen und Druck auf die USA aufbauen. Für die USA wird Kuba zum Containment-Fall direkt vor der eigenen Küste.",
+        image:img.cuba,
+        q:"Welche sowjetische Option wurde gewählt?",
+        choices:[
+          {t:"A) Heimlich Atomraketen auf Kuba stationieren.",real:true,fb:"Das geschah. Die Sowjetunion brachte Raketen nach Kuba. Als die USA sie entdeckten, wurde die Lage extrem gefährlich."},
+          {t:"B) Nur Wirtschaftshilfe schicken.",real:false,fb:"Das wäre weniger gefährlich gewesen, hätte aber nicht den gleichen Druck auf die USA erzeugt."},
+          {t:"C) Kuba aufgeben, um Streit mit den USA zu vermeiden.",real:false,fb:"Das wollte die Sowjetunion nicht. Kuba war ein wichtiger Verbündeter direkt vor der US-Küste."}
+        ]
+      },
+      {
+        title:"Kennedys Optionen",
+        meta:"Amerikanische Entscheidung",
+        date:"Washington, Oktober 1962",
+        doc:"US-Präsident John F. Kennedy, amerikanischer Regierungschef, bekommt Fotos der Raketen. Die Stimmung ist hoch eskalativ. Die USA bereiten sich militärisch vor und sind bereit, einen Atomkrieg zu riskieren, um sowjetische Atomraketen auf Kuba zu verhindern.",
+        image:img.cuba,
+        q:"Welche Entscheidung trifft Kennedy zuerst, um Druck aufzubauen und trotzdem nicht sofort zu schießen?",
+        choices:[
+          {t:"A) Luftangriff und danach Invasion Kubas.",real:false,fb:"Viele Militärs wollten das. Kennedy fürchtete aber, dass dabei sowjetische Soldaten sterben und die Sowjetunion zurückschlägt."},
+          {t:"B) Seeblockade, offiziell Quarantäne genannt.",real:true,fb:"Das war Kennedys Entscheidung. Sie machte Druck, stoppte weitere Lieferungen und ließ der Sowjetunion trotzdem einen Ausweg ohne sofortigen Krieg."},
+          {t:"C) Nichts tun und die Raketen akzeptieren.",real:false,fb:"Das hätte Kennedy innenpolitisch geschwächt und die Sicherheitslage der USA verändert."}
+        ]
+      },
+      {
+        title:"Ausweg aus der Krise",
+        meta:"Beide Seiten",
+        date:"Washington / Moskau, Oktober 1962",
+        doc:"Die Welt schaut auf Kuba. Amerikanische Streitkräfte sind in Alarmbereitschaft. Beide Seiten können hart bleiben oder einen Ausweg suchen. Jeder Schritt kann wie Schwäche wirken.",
+        image:img.cuba,
+        q:"Was wird am Ende vereinbart?",
+        choices:[
+          {t:"A) Die Sowjetunion zieht die Raketen ab; die USA versprechen, Kuba nicht anzugreifen. Die USA entfernen später Raketen aus der Türkei.",real:true,fb:"So endete die Krise. Öffentlich ging es um Kuba. In einem geheimen Teil der Lösung entfernten die USA später ihre Mittelstreckenraketen aus der Türkei."},
+          {t:"B) Beide Seiten greifen sofort an.",real:false,fb:"Das geschah nicht. Genau diese Eskalation wollten beide Regierungen am Ende vermeiden."},
+          {t:"C) Kuba entscheidet allein über alle Raketen.",real:false,fb:"Kuba war wichtig, aber die Hauptentscheidung lag bei den Supermächten USA und Sowjetunion."}
+        ]
+      }
+    ]
+  },
+  {
+    id:"vietnam",
+    title:"Vietnamkrieg",
+    years:"1964-1975",
+    side:"USA",
+    summary:"US-Präsident Lyndon B. Johnson muss entscheiden, ob die USA immer tiefer in Vietnam eingreifen.",
+    end:"Die USA eskalierten den Krieg: mehr Bomben, mehr Soldaten, mehr Kosten. 1973 zogen die USA nach dem Pariser Friedensabkommen ihre Kampftruppen ab. 1975 eroberte Nordvietnam Saigon. Vietnam wurde kommunistisch vereinigt.",
+    steps:[
+      {
+        title:"Golf von Tonkin",
+        meta:"Amerikanische Entscheidung",
+        date:"Washington, August 1964",
+        doc:"Amerikanische Schiffe melden Angriffe im Golf von Tonkin. Lyndon B. Johnson, amerikanischer Präsident, nutzt den Vorfall, um mehr Handlungsspielraum vom Kongress zu bekommen. Die Begründung lautet Containment: Südvietnam soll nicht kommunistisch werden.",
+        image:img.vietnam,
+        q:"Was wählt Johnson?",
+        choices:[
+          {t:"A) Den Kongress um Erlaubnis für stärkere militärische Maßnahmen bitten.",real:true,fb:"Das geschah. Die Tonkin-Resolution gab Johnson viel Macht für weitere Schritte in Vietnam."},
+          {t:"B) Den Krieg sofort beenden.",real:false,fb:"Das wäre möglich gewesen, passte aber nicht zur amerikanischen Eindämmungspolitik gegen den Kommunismus."},
+          {t:"C) Die Sowjetunion direkt angreifen.",real:false,fb:"Die USA wollten keinen direkten Krieg gegen die Sowjetunion. Vietnam blieb ein Stellvertreterkrieg."}
+        ]
+      },
+      {
+        title:"Bomben oder Verhandeln?",
+        meta:"Amerikanische Entscheidung",
+        date:"Washington, Februar 1965",
+        doc:"Nordvietnam unterstützt den Vietcong in Südvietnam. Johnsons Berater glauben: Mehr Druck kann Nordvietnam zum Nachgeben zwingen.",
+        image:img.vietnam,
+        q:"Welche Linie wird gewählt?",
+        choices:[
+          {t:"A) Operation Rolling Thunder: längere Bombardierung Nordvietnams.",real:true,fb:"Das geschah. Die USA hofften, Nordvietnam durch Bombenangriffe zu schwächen. Der Krieg wurde dadurch größer."},
+          {t:"B) Nur verhandeln, ohne militärischen Druck.",real:false,fb:"Diese Linie setzte sich 1965 nicht durch. Johnson wollte nicht als Präsident gelten, der Südvietnam verliert."},
+          {t:"C) Atomwaffen einsetzen.",real:false,fb:"Das war keine gewählte Politik. Der Einsatz hätte die Eskalation dramatisch verschärft."}
+        ]
+      },
+      {
+        title:"Mehr Bodentruppen",
+        meta:"Amerikanische Entscheidung",
+        date:"Washington, 1965",
+        doc:"General William Westmoreland, amerikanischer Oberbefehlshaber in Vietnam, fordert mehr Soldaten. Die Frage ist: Bleiben die USA Berater oder führen sie selbst Krieg?",
+        image:img.vietnam,
+        q:"Was entscheidet die amerikanische Regierung?",
+        choices:[
+          {t:"A) Mehr amerikanische Kampftruppen nach Vietnam schicken.",real:true,fb:"Das geschah. Aus Hilfe für Südvietnam wurde ein großer amerikanischer Bodenkrieg."},
+          {t:"B) Nur Ausbilder schicken und keine Kampftruppen.",real:false,fb:"Das war die frühere Rolle. 1965 wurde sie deutlich ausgeweitet."},
+          {t:"C) Südvietnam ganz allein kämpfen lassen.",real:false,fb:"Das hätte dem Ziel der USA widersprochen, die Ausbreitung des Kommunismus einzudämmen."}
+        ]
+      },
+      {
+        title:"Napalm und Agent Orange",
+        meta:"Amerikanische Entscheidung",
+        date:"Südvietnam, 1960er Jahre",
+        doc:"Die US-Armee kämpft gegen einen Gegner, der sich im Dschungel, in Dörfern und in Tunnelsystemen versteckt. Militärs setzen auf Feuerkraft und Chemikalien: Napalm brennt stark, Agent Orange entlaubt Wälder und Felder.",
+        image:img.orange,
+        q:"Welche Strategie wurde tatsächlich eingesetzt?",
+        choices:[
+          {t:"Napalm und Agent Orange einsetzen, um Gegner und Verstecke zu bekämpfen.",real:true,fb:"Das geschah. Die Folgen waren schwer: verbrannte Dörfer, zerstörte Umwelt und langfristige Gesundheitsschäden für viele Menschen."},
+          {t:"Auf solche Waffen verzichten und nur mit Polizeiaktionen arbeiten.",real:false,fb:"Das wäre weniger zerstörerisch gewesen. Die amerikanische Kriegsführung setzte aber stark auf Feuerkraft und technische Überlegenheit."},
+          {t:"Den Krieg sofort beenden, weil zivile Opfer unvermeidbar sind.",real:false,fb:"Diese Kritik wurde in der Öffentlichkeit immer lauter. Die Regierung beendete den Krieg aber nicht sofort."}
+        ]
+      },
+      {
+        title:"Friedensabkommen und Kriegsende",
+        meta:"Amerikanische und vietnamesische Entscheidung",
+        date:"Paris / Saigon, 1973-1975",
+        doc:"In den USA wächst der Protest. Der Krieg kostet viele Menschenleben und sehr viel Geld. Die Regierung von US-Präsident Richard Nixon, amerikanischer Regierungschef, sucht einen Ausweg.",
+        image:img.vietnam,
+        q:"Wie endet der Vietnamkrieg politisch?",
+        choices:[
+          {t:"Die USA schließen 1973 ein Friedensabkommen und ziehen ab; 1975 siegt Nordvietnam.",real:true,fb:"So endete der Konflikt. Für die USA war es kein Sieg. Südvietnam brach 1975 zusammen."},
+          {t:"Die USA gewinnen militärisch und bleiben dauerhaft in Saigon.",real:false,fb:"Das geschah nicht. Trotz großer militärischer Macht erreichten die USA ihr politisches Ziel nicht."},
+          {t:"Vietnam bleibt dauerhaft in einen kommunistischen Norden und einen antikommunistischen Süden geteilt.",real:false,fb:"Das war nicht das Ende. 1975 wurde Vietnam unter kommunistischer Führung vereinigt."}
+        ]
+      }
+    ]
+  },
+  {
+    id:"afghanistan",
+    title:"Afghanistan",
+    years:"1979-1989",
+    side:"Sowjetunion und USA",
+    summary:"Die Sowjetunion marschiert ein. Die USA reagieren mit Containment gegen sowjetischen Einfluss.",
+    end:"Die Sowjetunion blieb fast zehn Jahre in Afghanistan. Der Krieg kostete sehr viele Menschenleben, schwächte die Sowjetunion und endete 1989 mit dem sowjetischen Abzug. Danach folgte kein stabiler Frieden, sondern ein afghanischer Bürgerkrieg.",
+    steps:[
+      {
+        title:"Krise in Kabul",
+        meta:"Sowjetische Entscheidung",
+        date:"Moskau / Kabul, Dezember 1979",
+        doc:"Afghanistan hat eine kommunistische Regierung, aber sie ist instabil. Die sowjetische Führung fürchtet, ihren Einfluss an der Südgrenze zu verlieren. Für Moskau ist das ein Sicherheits- und Machtproblem.",
+        image:img.afghan,
+        q:"Welche Entscheidung trifft die sowjetische Führung?",
+        choices:[
+          {t:"Mit Truppen einmarschieren, Hafizullah Amin stürzen und Babrak Karmal einsetzen.",real:true,fb:"Das geschah. Die Sowjetunion marschierte im Dezember 1979 ein und setzte Babrak Karmal, einen afghanischen kommunistischen Politiker, an die Spitze."},
+          {t:"Nur Vermittler schicken und die afghanische Regierung selbst entscheiden lassen.",real:false,fb:"Das wäre weniger riskant gewesen. Die sowjetische Führung wollte aber direkten Einfluss sichern."},
+          {t:"Afghanistan ganz aufgeben und sich zurückziehen.",real:false,fb:"Das geschah 1979 nicht. Moskau wollte verhindern, dass Afghanistan aus dem sowjetischen Einflussbereich herausfällt."}
+        ]
+      },
+      {
+        title:"Amerikanische Antwort",
+        meta:"Amerikanische Entscheidung",
+        date:"Washington, 1980",
+        doc:"US-Präsident Jimmy Carter, amerikanischer Regierungschef, sieht den Einmarsch als klare sowjetische Expansion. Für die USA ist das ein Containment-Anlass: Die Ausweitung sowjetischer Macht soll gestoppt werden.",
+        image:img.afghan,
+        q:"Wie reagiert die amerikanische Regierung?",
+        choices:[
+          {t:"Sanktionen, Olympiaboykott, Carter-Doktrin und Hilfe für afghanische Widerstandsgruppen.",real:true,fb:"Das geschah. Die USA erhöhten den Druck auf die Sowjetunion und unterstützten Mudschaheddin, also afghanische Widerstandskämpfer."},
+          {t:"Den sowjetischen Einmarsch akzeptieren, um Entspannungspolitik zu retten.",real:false,fb:"Die Entspannungspolitik erlitt einen schweren Bruch. Carter wollte zeigen, dass die USA sowjetische Expansion nicht hinnehmen."},
+          {t:"Direkt amerikanische Kampftruppen nach Afghanistan schicken.",real:false,fb:"Das geschah nicht. Die USA wollten keinen direkten Krieg mit der Sowjetunion beginnen."}
+        ]
+      },
+      {
+        title:"Krieg ohne schnellen Sieg",
+        meta:"Sowjetische Entscheidung",
+        date:"Afghanistan, 1980er Jahre",
+        doc:"Die sowjetische Armee kontrolliert Städte und Straßen, aber viele ländliche Regionen bleiben umkämpft. Die Mudschaheddin bekommen Unterstützung aus dem Ausland, auch von den USA und Pakistan.",
+        image:img.afghan,
+        q:"Welche Lage entsteht?",
+        choices:[
+          {t:"Ein langer Guerillakrieg, der die Sowjetunion politisch und militärisch belastet.",real:true,fb:"So entwickelte sich der Krieg. Afghanistan wurde für die Sowjetunion zu einem sehr teuren und zermürbenden Konflikt."},
+          {t:"Ein schneller sowjetischer Sieg nach wenigen Wochen.",real:false,fb:"Das geschah nicht. Der Widerstand blieb stark und der Krieg zog sich fast zehn Jahre."},
+          {t:"Ein sofortiger Friedensvertrag zwischen USA und Sowjetunion.",real:false,fb:"Es gab keinen schnellen Friedensvertrag. Afghanistan wurde zu einem wichtigen Konfliktfeld des späten Kalten Krieges."}
+        ]
+      },
+      {
+        title:"Abzug und offenes Ende",
+        meta:"Sowjetische und afghanische Entscheidung",
+        date:"Afghanistan, 1989",
+        doc:"Michail Gorbatschow, sowjetischer Staats- und Parteichef, will die Belastung beenden. Die sowjetischen Truppen ziehen ab.",
+        image:img.afghan,
+        q:"Womit endet der sowjetische Afghanistan-Krieg?",
+        choices:[
+          {t:"Mit dem sowjetischen Abzug 1989, aber ohne stabilen Frieden in Afghanistan.",real:true,fb:"Das ist das Ende dieses Konfliktfeldes: Rückzug der Supermacht, aber kein wirklich befriedeter Staat."},
+          {t:"Mit einer dauerhaften sowjetischen Provinz Afghanistan.",real:false,fb:"Afghanistan wurde keine sowjetische Provinz. Die Truppen zogen 1989 ab."},
+          {t:"Mit einem klaren amerikanischen Einmarsch und einer US-Besatzung 1989.",real:false,fb:"Das geschah nicht. Die USA unterstützten Gegner der Sowjetunion indirekt, marschierten damals aber nicht ein."}
+        ]
+      }
+    ]
+  },
+  {
+    id:"grenada",
+    title:"Grenada",
+    years:"1983",
+    side:"USA",
+    summary:"US-Präsident Ronald Reagan verbindet Rettung amerikanischer Studenten mit Containment gegen kubanisch-sowjetischen Einfluss.",
+    end:"Die US-geführte Invasion Operation Urgent Fury dauerte militärisch nur wenige Tage. Amerikanische Studenten wurden evakuiert, die marxistisch geprägte Militärregierung wurde abgesetzt und 1984 fanden Wahlen statt. Der Einsatz blieb international umstritten.",
+    steps:[
+      {
+        title:"Putsch auf Grenada",
+        meta:"Amerikanische Entscheidung",
+        date:"Grenada / Washington, Oktober 1983",
+        doc:"Auf Grenada wird Premierminister Maurice Bishop, ein grenadischer Regierungschef mit sozialistischer Politik, nach einem Machtkampf getötet. Gleichzeitig gibt es kubanische Präsenz und eine große Baustelle für einen Flughafen. Für US-Präsident Ronald Reagan ist das ein Containment-Anlass in der Karibik.",
+        image:img.grenada,
+        q:"Welche Gefahr sieht die amerikanische Regierung?",
+        choices:[
+          {t:"Grenada könnte zu einem kubanisch-sowjetischen Stützpunkt in der Karibik werden.",real:true,fb:"So argumentierte Reagan. Er sah Grenada als möglichen Vorposten für kommunistischen Einfluss nahe bei den USA."},
+          {t:"Grenada könnte der NATO beitreten.",real:false,fb:"Das war nicht die Sorge. Grenada war ein kleiner Inselstaat, der sich politisch eher Kuba und sozialistischen Staaten angenähert hatte."},
+          {t:"Grenada könnte sofort die USA militärisch besiegen.",real:false,fb:"Das war unrealistisch. Die Sorge war nicht militärische Stärke Grenadas, sondern Einfluss von Kuba und der Sowjetunion."}
+        ]
+      },
+      {
+        title:"Studenten und Bündnispartner",
+        meta:"Amerikanische Entscheidung",
+        date:"Washington, Oktober 1983",
+        doc:"Auf Grenada befinden sich mehrere hundert amerikanische Medizinstudenten. Die Organisation Ostkaribischer Staaten bittet um Hilfe. Reagan verbindet Schutz von US-Bürgern, Wiederherstellung von Ordnung und Containment.",
+        image:img.grenada,
+        q:"Welche Entscheidung trifft Reagan?",
+        choices:[
+          {t:"Eine US-geführte Invasion starten: Operation Urgent Fury.",real:true,fb:"Das geschah am 25. Oktober 1983. Die USA griffen gemeinsam mit karibischen Verbündeten ein."},
+          {t:"Nur eine Protestnote schreiben und militärisch nichts tun.",real:false,fb:"Das wäre möglich gewesen. Reagan wollte aber schnell handeln und Stärke gegen kommunistischen Einfluss zeigen."},
+          {t:"Die Sowjetunion direkt angreifen.",real:false,fb:"Das geschah nicht. Grenada blieb ein begrenzter regionaler Einsatz, kein direkter Krieg gegen die Sowjetunion."}
+        ]
+      },
+      {
+        title:"Militärischer Verlauf",
+        meta:"Amerikanische Entscheidung",
+        date:"Grenada, Oktober/November 1983",
+        doc:"US-Truppen landen auf Grenada. Es gibt Widerstand von grenadischen und kubanischen Kräften, aber die USA sind militärisch deutlich überlegen.",
+        image:img.grenada,
+        q:"Was passiert militärisch?",
+        choices:[
+          {t:"Die USA erreichen ihre militärischen Ziele nach wenigen Tagen.",real:true,fb:"So verlief der Einsatz. Die USA evakuierten Studenten, besetzten wichtige Punkte und setzten die Militärregierung ab."},
+          {t:"Der Krieg dauert zehn Jahre wie in Afghanistan.",real:false,fb:"Das geschah nicht. Grenada war ein kurzer Einsatz, auch wenn er politisch sehr umstritten blieb."},
+          {t:"Kuba und die Sowjetunion schlagen die USA zurück.",real:false,fb:"Das geschah nicht. Es gab kubanischen Widerstand, aber keine erfolgreiche Zurückdrängung der US-Truppen."}
+        ]
+      },
+      {
+        title:"Ende des Konflikts",
+        meta:"Grenadische und amerikanische Entscheidung",
+        date:"Grenada, 1983-1984",
+        doc:"Nach der Invasion wird eine Übergangsregierung eingesetzt. Die USA ziehen ihre Kampftruppen ab. In Grenada finden später Wahlen statt.",
+        image:img.grenada,
+        q:"Womit endet dieser Konflikt?",
+        choices:[
+          {t:"Mit US-Abzug, Übergangsregierung und Wahlen 1984, aber internationaler Kritik.",real:true,fb:"So endete Grenada. Für Reagan war es ein Erfolg gegen kommunistischen Einfluss. Kritiker sahen eine Verletzung der Souveränität Grenadas."},
+          {t:"Mit einer dauerhaften US-Kolonie Grenada.",real:false,fb:"Das geschah nicht. Die USA blieben nicht als Kolonialmacht."},
+          {t:"Mit einem Atomkrieg in der Karibik.",real:false,fb:"Das geschah nicht. Der Einsatz war militärisch begrenzt und regional."}
+        ]
+      }
+    ]
+  },
+  {
+    id:"decolonization",
+    title:"Dekolonisierung",
+    years:"1945-1970",
+    side:"USA und Sowjetunion",
+    summary:"Neue Staaten in Asien und Afrika werden unabhängig. Beide Supermächte wollen Einfluss gewinnen.",
+    end:"Dekolonisierung endete nicht mit einem einzigen Vertrag. Viele Staaten wurden unabhängig, aber oft blieben Armut, Grenzen aus der Kolonialzeit und Stellvertreterkonflikte. Viele Regierungen versuchten Blockfreiheit, andere näherten sich den USA oder der Sowjetunion an.",
+    steps:[
+      {
+        title:"Neue Staaten entstehen",
+        meta:"Globale Entscheidung",
+        date:"Asien und Afrika, nach 1945",
+        doc:"Viele Kolonien werden unabhängig. Die USA und die Sowjetunion sehen Chancen: neue Bündnispartner, Rohstoffe, Militärstützpunkte und Stimmen in den Vereinten Nationen. Für die USA bedeutet Containment hier: kommunistischen Einfluss in neuen Staaten begrenzen.",
+        image:img.bandung,
+        q:"Wie können Supermächte Einfluss gewinnen?",
+        choices:[
+          {t:"A) Wirtschaftshilfe, Waffen, Berater und politische Unterstützung anbieten.",real:true,fb:"Genau das taten beide Seiten oft. Einfluss musste nicht immer direkte Herrschaft bedeuten."},
+          {t:"B) Alle neuen Staaten einfach in Ruhe lassen.",real:false,fb:"Das wäre weniger gefährlich gewesen. Im Kalten Krieg wollten beide Seiten aber verhindern, dass die andere Seite Einfluss gewinnt."},
+          {t:"C) Europa alle Kolonien zurückgeben.",real:false,fb:"Das war nach 1945 immer weniger möglich. Viele Unabhängigkeitsbewegungen waren stark."}
+        ]
+      },
+      {
+        title:"Nicht blockfrei?",
+        meta:"Entscheidung neuer Staaten",
+        date:"Bandung / Belgrad, 1955-1961",
+        doc:"Viele neue Staaten wollen nicht nur Anhängsel der USA oder der Sowjetunion sein. Politiker aus Asien und Afrika sprechen über einen eigenen Weg.",
+        image:img.bandung,
+        q:"Welche Option wählen viele neue Staaten?",
+        choices:[
+          {t:"A) Blockfreiheit: nicht fest zu einem Lager gehören.",real:true,fb:"Viele Staaten wählten diesen Weg. Sie wollten unabhängig bleiben und trotzdem Hilfe bekommen."},
+          {t:"B) Automatisch der Sowjetunion beitreten.",real:false,fb:"Einige Staaten näherten sich der Sowjetunion an, aber viele wollten keine feste Unterordnung."},
+          {t:"C) Automatisch den USA beitreten.",real:false,fb:"Auch die USA gewannen Partner, aber viele Regierungen misstrauten westlichen Ex-Kolonialmächten."}
+        ]
+      },
+      {
+        title:"Konflikte im Inneren",
+        meta:"Supermacht-Entscheidung",
+        date:"Afrika und Asien, 1950er/1960er Jahre",
+        doc:"In einigen neuen Staaten gibt es Bürgerkriege, Militärputsche oder Konflikte um Rohstoffe. USA und Sowjetunion überlegen, welche Gruppen sie unterstützen.",
+        image:img.bandung,
+        q:"Was passiert im Kalten Krieg häufig?",
+        choices:[
+          {t:"A) Die Supermächte unterstützen unterschiedliche Seiten.",real:true,fb:"Das geschah häufig. Lokale Konflikte wurden dadurch Teil des Kalten Krieges."},
+          {t:"B) Die Supermächte einigen sich immer neutral.",real:false,fb:"Manchmal gab es Diplomatie. Oft aber überwog die Angst, Einfluss an die andere Seite zu verlieren."},
+          {t:"C) Neue Staaten verlieren sofort ihre Unabhängigkeit.",real:false,fb:"So einfach war es nicht. Viele Regierungen handelten selbstbewusst und nutzten die Konkurrenz der Supermächte."}
+        ]
+      },
+      {
+        title:"Ein offenes Ende",
+        meta:"Globale Entscheidung",
+        date:"Asien und Afrika, bis 1970",
+        doc:"Bis 1970 sind sehr viele neue Staaten in die Vereinten Nationen aufgenommen. Sie verändern die Weltpolitik. Aber Unabhängigkeit löst nicht automatisch alle Probleme.",
+        image:img.bandung,
+        q:"Womit endet dieses Konfliktfeld des Kalten Krieges?",
+        choices:[
+          {t:"Mit vielen unabhängigen Staaten, Blockfreiheit und neuen Konflikten um Einfluss.",real:true,fb:"Das ist der Kern: Die Kolonialreiche verschwinden weitgehend, aber der Kampf um Einfluss geht weiter."},
+          {t:"Mit einer vollständigen Rückkehr der europäischen Kolonialreiche.",real:false,fb:"Das geschah nicht. Die Richtung der Geschichte ging klar zur Unabhängigkeit vieler Kolonien."},
+          {t:"Mit einem einzigen Friedensvertrag zwischen USA und Sowjetunion.",real:false,fb:"Es gab kein einzelnes Ende. Dekolonisierung war ein langer Prozess mit vielen unterschiedlichen Ergebnissen."}
+        ]
+      }
+    ]
+  }
+];
+
+var active=null;
+var stepIndex=0;
+var score=0;
+var answered=false;
+var visibleChoices=[];
+
+function G(id){return document.getElementById(id);}
+function setScreen(id){
+  document.querySelectorAll(".screen").forEach(function(el){el.classList.remove("on")});
+  G(id).classList.add("on");
+  window.scrollTo({top:0,behavior:"smooth"});
+}
+function scrollToGames(){G("games").scrollIntoView({behavior:"smooth",block:"start"})}
+function showMenu(){active=null;setScreen("menu")}
+function buildMenu(){
+  var list=G("conflictList");
+  list.innerHTML="";
+  games.forEach(function(game){
+    var b=document.createElement("button");
+    b.className="conflict-card";
+    b.innerHTML='<span class="side">'+game.side+'</span><strong>'+game.title+' ('+game.years+')</strong><span>'+game.summary+'</span>';
+    b.onclick=function(){startGame(game.id)};
+    list.appendChild(b);
+  });
+}
+function startGame(id){
+  active=games.find(function(g){return g.id===id});
+  stepIndex=0;
+  score=0;
+  renderStep();
+  setScreen("play");
+}
+function renderStep(){
+  answered=false;
+  var step=active.steps[stepIndex];
+  G("stepLabel").textContent="Schritt "+(stepIndex+1)+" von "+active.steps.length;
+  G("scoreLabel").textContent=score+" / "+active.steps.length+" reale Entscheidungen";
+  G("bar").style.width=(stepIndex/active.steps.length*100)+"%";
+  G("caseMeta").textContent=step.meta+" - "+active.title;
+  G("caseTitle").textContent=step.title;
+  G("docDate").textContent=step.date;
+  G("docText").textContent=step.doc;
+  if(step.image){
+    G("imageCard").classList.add("on");
+    G("stepImage").src=step.image.src;
+    G("stepImage").alt=step.image.alt;
+    G("imageCaption").innerHTML=step.image.caption+' <a href="'+step.image.link+'">Quelle</a>';
+  }else{
+    G("imageCard").classList.remove("on");
+    G("stepImage").removeAttribute("src");
+    G("stepImage").alt="";
+    G("imageCaption").textContent="";
+  }
+  G("question").textContent=step.q;
+  var choices=G("choices");
+  choices.innerHTML="";
+  visibleChoices=shuffle(step.choices);
+  visibleChoices.forEach(function(choice,i){
+    var b=document.createElement("button");
+    b.className="cbtn";
+    b.textContent=String.fromCharCode(65+i)+") "+choice.t.replace(/^[A-C]\)\s*/,"");
+    b.onclick=function(){pickChoice(i)};
+    choices.appendChild(b);
+  });
+  G("feedback").className="fb";
+  G("feedback").textContent="";
+  G("nextBtn").className="next";
+  G("nextBtn").textContent=stepIndex===active.steps.length-1?"Auswertung anzeigen":"Weiter";
+}
+function pickChoice(index){
+  if(answered)return;
+  answered=true;
+  var choice=visibleChoices[index];
+  document.querySelectorAll(".cbtn").forEach(function(btn,i){
+    btn.disabled=true;
+    if(visibleChoices[i].real){btn.classList.add("ok")}
+    else if(i===index){btn.classList.add("no")}
+  });
+  if(choice.real)score++;
+  var fb=G("feedback");
+  fb.className="fb on "+(choice.real?"ok":"no");
+  fb.textContent=(choice.real?"Reale Entscheidung: ":"Andere Option: ")+choice.fb;
+  G("scoreLabel").textContent=score+" / "+active.steps.length+" reale Entscheidungen";
+  G("nextBtn").classList.add("on");
+}
+function shuffle(items){
+  var copy=items.slice();
+  for(var i=copy.length-1;i>0;i--){
+    var j=Math.floor(Math.random()*(i+1));
+    var temp=copy[i];
+    copy[i]=copy[j];
+    copy[j]=temp;
+  }
+  return copy;
+}
+function nextStep(){
+  stepIndex++;
+  if(stepIndex>=active.steps.length){showEnd();return}
+  renderStep();
+}
+function showEnd(){
+  G("bar").style.width="100%";
+  G("endTitle").textContent=active.title+": Was wirklich geschah";
+  G("endText").textContent=active.end;
+  G("againBtn").onclick=function(){startGame(active.id)};
+  setScreen("end");
+}
+buildMenu();
+</script>
+</body>
+</html>

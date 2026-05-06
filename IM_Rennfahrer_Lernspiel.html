@@ -1,0 +1,400 @@
+<!DOCTYPE html>
+<html lang="de">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0">
+<title>IM „Rennfahrer" – Lernspiel</title>
+<style>
+*, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+body {
+  font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Helvetica, Arial, sans-serif;
+  background: #f0ede8;
+  color: #1a1a1a;
+  min-height: 100vh;
+  font-size: 16px;
+  line-height: 1.6;
+}
+#app { max-width: 600px; margin: 0 auto; padding: 16px 16px 48px; }
+.screen { display: none; }
+.screen.on { display: block; }
+.topbar {
+  display: flex; justify-content: space-between; align-items: center;
+  padding: 8px 0 12px; border-bottom: 1px solid #d8d4cc; margin-bottom: 16px;
+  font-size: 12px; color: #888; font-family: 'Courier New', monospace;
+}
+.pb-wrap { margin-bottom: 16px; }
+.pb-label { display: flex; justify-content: space-between; font-size: 12px; color: #888; font-family: 'Courier New', monospace; margin-bottom: 5px; }
+.pb { height: 3px; background: #d8d4cc; border-radius: 2px; }
+.pb-fill { height: 100%; background: #2563eb; border-radius: 2px; transition: width 0.4s ease; }
+.doc {
+  background: #fdfcf7; border: 1px solid #ddd8cc; border-radius: 8px;
+  padding: 16px; font-family: 'Courier New', monospace; font-size: 13px;
+  line-height: 1.85; margin: 12px 0; box-shadow: 0 1px 4px rgba(0,0,0,0.07);
+}
+.doc-meta {
+  display: flex; justify-content: space-between; align-items: flex-start;
+  margin-bottom: 10px; padding-bottom: 9px; border-bottom: 1px solid #e8e4dc;
+  font-size: 11px; color: #999; gap: 8px;
+}
+.doc-date { flex: 1; }
+.stamp { border: 1.5px solid #b91c1c; color: #b91c1c; padding: 2px 6px; font-size: 9px; letter-spacing: 1px; white-space: nowrap; flex-shrink: 0; }
+.doc-sub { font-size: 12px; color: #555; margin-bottom: 10px; font-weight: bold; text-decoration: underline; }
+.redact { background: #1a1a1a; color: transparent; padding: 0 3px; border-radius: 1px; user-select: none; }
+.qbox {
+  background: #fff; border: 1px solid #e0dbd2; border-radius: 8px;
+  padding: 14px 16px; font-size: 14px; line-height: 1.65; margin-bottom: 12px;
+  border-left: 3px solid #2563eb;
+}
+.cbtn {
+  display: block; width: 100%; text-align: left; background: #fff;
+  border: 1px solid #e0dbd2; border-radius: 8px; padding: 13px 15px;
+  font-size: 13px; cursor: pointer; font-family: inherit; line-height: 1.55;
+  color: #1a1a1a; margin-bottom: 8px; transition: border-color 0.15s, background 0.15s;
+}
+.cbtn:hover:not([disabled]) { border-color: #999; background: #f8f7f4; }
+.cbtn[disabled] { cursor: default; }
+.cbtn.ok { border-color: #16a34a; background: #f0fdf4; color: #166534; }
+.cbtn.no { border-color: #dc2626; background: #fef2f2; color: #991b1b; opacity: 0.8; }
+.fb {
+  display: none; border-left: 3px solid #ccc; padding: 11px 15px;
+  margin-bottom: 12px; font-size: 13px; line-height: 1.65; border-radius: 0;
+}
+.fb.on { display: block; }
+.fb.ok { border-color: #16a34a; background: #f0fdf4; color: #166534; }
+.fb.no { border-color: #dc2626; background: #fef2f2; color: #991b1b; }
+.nbtn {
+  display: none; width: 100%; padding: 14px; background: #1a1a1a; border: none;
+  border-radius: 8px; color: #fff; font-size: 14px; cursor: pointer;
+  font-family: inherit; margin-top: 4px; transition: background 0.15s;
+}
+.nbtn:hover { background: #333; }
+.nbtn.on { display: block; }
+.nbtn.outline { background: transparent; border: 1px solid #ccc; color: #555; }
+.nbtn.outline:hover { background: #e8e5e0; }
+.cat { display: inline-block; padding: 4px 11px; font-size: 11px; border-radius: 20px; margin-bottom: 8px; font-weight: 600; }
+.ct { background: #d1fae5; color: #065f46; }
+.cb { background: #dbeafe; color: #1e40af; }
+.cp { background: #ede9fe; color: #4c1d95; }
+.cr { background: #fee2e2; color: #991b1b; }
+.ca { background: #fef3c7; color: #78350f; }
+.icard { background: #fff; border: 1px solid #e0dbd2; border-radius: 10px; padding: 16px 18px; margin: 12px 0; font-size: 14px; line-height: 1.7; }
+.lbl { display: block; font-size: 10px; color: #999; letter-spacing: 2px; text-transform: uppercase; margin-bottom: 9px; font-family: 'Courier New', monospace; }
+.hero { text-align: center; padding: 2rem 0 1.2rem; }
+.hero-icon {
+  width: 52px; height: 52px; border: 1px solid #d0ccc4; border-radius: 10px;
+  display: flex; align-items: center; justify-content: center;
+  margin: 0 auto 14px; background: #fff;
+}
+.hero h1 { font-size: 22px; font-weight: 700; margin-bottom: 6px; }
+.hero .sub { font-size: 13px; color: #888; font-family: 'Courier New', monospace; }
+.stat-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 8px; margin: 12px 0; }
+.stat-cell { background: #fafaf8; border: 1px solid #e8e4dc; border-radius: 8px; padding: 12px; text-align: center; }
+.stat-cell .num { font-size: 21px; font-weight: 700; color: #b91c1c; }
+.stat-cell .desc { font-size: 11px; color: #777; margin-top: 2px; line-height: 1.4; }
+.gloss { font-family: 'Courier New', monospace; font-size: 12px; line-height: 1.8; }
+.gloss dt { color: #b91c1c; font-weight: bold; margin-top: 8px; }
+.gloss dt:first-child { margin-top: 0; }
+.gloss dd { color: #555; margin-left: 0; }
+.role-card {
+  background: #fdfcf7; border: 1px solid #ddd8cc; border-radius: 8px;
+  padding: 14px 16px; font-family: 'Courier New', monospace;
+  font-size: 13px; color: #555; line-height: 1.9; margin: 12px 0;
+}
+.warn-card { background: #fff9f9; border: 1px solid #fca5a5; border-radius: 8px; padding: 14px 16px; font-size: 13px; color: #991b1b; line-height: 1.7; margin: 12px 0; }
+.score-area { text-align: center; padding: 1.2rem 0; }
+.score-big { font-size: 58px; font-weight: 700; line-height: 1; margin: 8px 0; }
+.score-label { font-size: 12px; color: #888; }
+.score-comment { font-size: 13px; color: #666; margin-top: 10px; font-style: italic; }
+.alert-box {
+  border-left: 3px solid #b91c1c; background: #fef2f2; color: #991b1b;
+  padding: 14px 16px; margin: 12px 0; font-size: 13px; line-height: 1.8; border-radius: 0;
+}
+.alert-box strong { display: block; margin-bottom: 6px; font-size: 14px; }
+.verdict-box { border: 1px solid #fca5a5; background: #fff9f9; color: #991b1b; padding: 14px 16px; border-radius: 8px; margin: 12px 0; font-size: 13px; line-height: 1.7; }
+.verdict-box strong { display: block; margin-bottom: 6px; }
+.cat-overview { background: #fff; border: 1px solid #e0dbd2; border-radius: 10px; padding: 16px 18px; margin: 12px 0; }
+.crow { display: flex; align-items: flex-start; gap: 9px; margin: 7px 0; font-size: 13px; line-height: 1.5; }
+.aufgaben-box { background: #fff; border: 1px solid #e0dbd2; border-radius: 10px; padding: 16px 18px; margin: 12px 0; }
+.task-step { display: flex; gap: 13px; margin-bottom: 16px; align-items: flex-start; }
+.task-step:last-child { margin-bottom: 0; }
+.task-num {
+  min-width: 28px; height: 28px; background: #1a1a1a; color: #fff; border-radius: 50%;
+  display: flex; align-items: center; justify-content: center;
+  font-size: 13px; font-weight: 700; flex-shrink: 0; margin-top: 2px;
+}
+.task-text { font-size: 13px; line-height: 1.7; }
+.task-text strong { display: block; margin-bottom: 3px; font-size: 13px; }
+.discuss-box { border: 1px solid #bfdbfe; background: #eff6ff; color: #1e3a8a; padding: 14px 16px; border-radius: 8px; margin: 12px 0; font-size: 13px; line-height: 1.75; }
+.discuss-box strong { display: block; margin-bottom: 8px; }
+.stitle { font-size: 11px; color: #aaa; font-family: 'Courier New', monospace; margin-bottom: 4px; }
+</style>
+</head>
+<body>
+<div id="app">
+
+<!-- SCREEN 0: STASI-EINSTIEG -->
+<div id="s0" class="screen on">
+  <div class="hero">
+    <div class="hero-icon">
+      <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="#666" stroke-width="1.5">
+        <path stroke-linecap="round" stroke-linejoin="round" d="M2 6a2 2 0 012-2h5l2 2h9a2 2 0 012 2v8a2 2 0 01-2 2H4a2 2 0 01-2-2V6z"/>
+      </svg>
+    </div>
+    <h1>IM &#8222;Rennfahrer&#8220;</h1>
+    <p class="sub">Lernspiel zu echten Stasi-Akten &middot; 1970er Jahre</p>
+  </div>
+
+  <div class="icard">
+    <span class="lbl">Was war die Stasi?</span>
+    <p>Das <strong>Ministerium f&#252;r Staatssicherheit</strong> (MfS, kurz: Stasi) war der Geheimdienst der DDR. Gegr&#252;ndet 1950, hatte es zwei Aufgaben: die eigene Bev&#246;lkerung zu &#252;berwachen &#8211; und im Westen zu spionieren.</p>
+    <div class="stat-grid">
+      <div class="stat-cell"><div class="num">91.000</div><div class="desc">fest angestellte Mitarbeiter (1989)</div></div>
+      <div class="stat-cell"><div class="num">600.000</div><div class="desc">Spitzel ohne feste Anstellung (Sch&#228;tzung)</div></div>
+    </div>
+  </div>
+
+  <div class="icard">
+    <span class="lbl">Wichtige Begriffe</span>
+    <dl class="gloss">
+      <dt>IM &#8211; Inoffizieller Mitarbeiter</dt>
+      <dd>Spitzel, der heimlich f&#252;r die Stasi arbeitete &#8211; oft gegen Bezahlung, meist im Westen.</dd>
+      <dt>MfS &#8211; Ministerium f&#252;r Staatssicherheit</dt>
+      <dd>Der offizielle Name der Stasi.</dd>
+      <dt>HA VIII &#8211; Hauptabteilung VIII</dt>
+      <dd>Abteilung der Stasi, die im Westen Menschen beobachtete und Informationen sammelte.</dd>
+      <dt>KP &#8211; Kontaktperson</dt>
+      <dd>Jemand, den die Stasi nutzte &#8211; ohne dass er selbst davon wusste.</dd>
+      <dt>Operationsgebiet</dt>
+      <dd>So nannte die Stasi intern die BRD und Westberlin &#8211; das Gebiet, in dem sie im Westen aktiv war.</dd>
+      <dt>BStU</dt>
+      <dd>Beh&#246;rde, die nach 1990 die Stasi-Akten &#252;bernahm und f&#252;r Betroffene zug&#228;nglich machte.</dd>
+    </dl>
+  </div>
+
+  <button class="nbtn on" onclick="show('s1')">Weiter &#8594;</button>
+</div>
+
+<!-- SCREEN 1: ROLLENEINFUEHRUNG -->
+<div id="s1" class="screen">
+  <div class="hero" style="padding-top:1rem">
+    <h1>Deine Rolle</h1>
+  </div>
+  <div class="role-card">
+    <strong style="font-family:inherit;display:block;margin-bottom:6px;color:#1a1a1a;font-size:13px">Einsatzbefehl</strong>
+    Hauptmann &#8212; Hauptabteilung VIII, Abt. 6<br>
+    Ministerium f&#252;r Staatssicherheit<br>
+    Berlin, 1970&#8211;1976<br><br>
+    Du bearbeitest die Akte des IM <strong style="color:#1a1a1a">&#8222;Rennfahrer&#8220;</strong>, Jahrgang 1929 &#8211; ein westdeutscher Kaufmann, der ab 1970 f&#252;r die Stasi arbeitete.<br><br>
+    Sein Grund: <em>Geld.</em>
+  </div>
+  <div class="warn-card">
+    Du triffst in 6 F&#228;llen echte Entscheidungen aus dem Stasi-Alltag. F&#252;r jede Entscheidung gibt es eine &#8222;richtige&#8220; Antwort &#8211; <em>die Antwort, die die Stasi tats&#228;chlich gew&#228;hlt hat.</em> Am Ende erf&#228;hrst du, was wirklich geschah.
+  </div>
+  <button class="nbtn on" onclick="startGame()">Akte &#246;ffnen &#8594;</button>
+</div>
+
+<!-- GAME SCREEN -->
+<div id="sg" class="screen">
+  <div class="topbar"><span>MfS // HA VIII</span><span id="sd">0 / 6</span></div>
+  <div class="pb-wrap">
+    <div class="pb-label"><span id="fl">Fall 1 von 6</span><span id="cl" style="color:#aaa"></span></div>
+    <div class="pb"><div class="pb-fill" id="pf" style="width:0%"></div></div>
+  </div>
+  <div id="cbw"></div>
+  <p class="stitle" id="st"></p>
+  <div class="doc">
+    <div class="doc-meta"><span class="doc-date" id="dd"></span><span class="stamp" id="dz"></span></div>
+    <div class="doc-sub" id="ds"></div>
+    <div id="dt"></div>
+  </div>
+  <div class="qbox" id="qt"></div>
+  <div id="ch"></div>
+  <div class="fb" id="fb"></div>
+  <button class="nbtn" id="nb" onclick="step()"></button>
+</div>
+
+<!-- RESULT SCREEN -->
+<div id="sr" class="screen">
+  <div class="topbar">
+    <span>MfS // HA VIII</span>
+    <span style="color:#b91c1c;font-size:11px;font-family:'Courier New',monospace">Aufl&#246;sung</span>
+  </div>
+  <div class="score-area">
+    <div class="score-label">Wie gut denkst du wie die Stasi?</div>
+    <div class="score-big" id="fs"></div>
+    <div class="score-label">von 6 m&#246;glichen Punkten</div>
+    <div class="score-comment" id="sc2"></div>
+  </div>
+  <div class="alert-box">
+    <strong>Das war kein Spiel.</strong>
+    Diese Entscheidungen hat die Stasi wirklich so getroffen. Die Dokumente sind echt. Die Menschen dahinter auch.
+    <p style="margin-top:10px">&#8222;Rennfahrer&#8220; brachte <strong>14 weitere Personen</strong> dazu, f&#252;r die Stasi zu arbeiten. Die Stasi zahlte ihm zwischen 1970 und 1989 insgesamt <strong>803.305 DM</strong> &#8211; umgerechnet rund 400.000 Euro.</p>
+  </div>
+  <div class="verdict-box">
+    <strong>Das Urteil, 1993:</strong>
+    Ein deutsches Gericht verurteilte &#8222;Rennfahrer&#8220; zu <strong>viereinhalb Jahren Haft</strong> &#8211; wegen Spionage f&#252;r einen fremden Geheimdienst und versuchten Mordes.
+  </div>
+  <div class="cat-overview">
+    <span class="lbl">Was &#8222;Rennfahrer&#8220; f&#252;r die Stasi tat</span>
+    <div class="crow"><span class="cat cb">Informationen beschaffen</span><span>Geheime Industrieformeln und Betriebsgeheimnisse (Bayer-AG)</span></div>
+    <div class="crow"><span class="cat cp">Material beschaffen</span><span>Waffen, Polizeiausr&#252;stung, Uniformen, gef&#228;lschte Ausweise</span></div>
+    <div class="crow"><span class="cat cr">Geheimoperationen</span><span>Einbr&#252;che, Observationen, Mordauftrag</span></div>
+    <div class="crow"><span class="cat ca">Neue Spitzel anwerben</span><span>Weitere Personen f&#252;r die Stasi gewinnen und an sie binden</span></div>
+    <div class="crow"><span class="cat ct">Spitzel kontrollieren</span><span>Beweggr&#252;nde pr&#252;fen, steuern, bezahlen</span></div>
+  </div>
+  <div class="aufgaben-box">
+    <span class="lbl">Aufgaben</span>
+    <div class="task-step">
+      <div class="task-num">1</div>
+      <div class="task-text">
+        <strong>Ordnen und erkl&#228;ren</strong>
+        Ordnet die sechs F&#228;lle den f&#252;nf Bereichen oben zu. Was hat &#8222;Rennfahrer&#8220; jeweils getan? Notiert f&#252;r jeden Bereich ein konkretes Beispiel aus dem Spiel.
+      </div>
+    </div>
+    <div class="task-step">
+      <div class="task-num">2</div>
+      <div class="task-text">
+        <strong>Das Urteil bewerten</strong>
+        Das Gericht verurteilte &#8222;Rennfahrer&#8220; 1993 zu 4,5 Jahren Haft. Findet ihr das gerecht &#8211; oder zu wenig bzw. zu viel? Begr&#252;ndet eure Meinung mit Beispielen aus den F&#228;llen.
+      </div>
+    </div>
+    <div class="task-step">
+      <div class="task-num">3</div>
+      <div class="task-text">
+        <strong>&#220;ber Motive nachdenken</strong>
+        &#8222;Rennfahrer&#8220; arbeitete f&#252;r die Stasi, weil er Geld brauchte &#8211; nicht weil er die DDR gut fand. Macht das einen Unterschied, wenn man seine Taten beurteilt? Begr&#252;ndet eure Antwort.
+      </div>
+    </div>
+  </div>
+  <div class="discuss-box">
+    <strong>Diskussionsfragen f&#252;r die Klasse</strong>
+    <p>&#8594; Wer ist schuldig: der Spitzel, der die Arbeit macht &#8211; oder die Stasi, die ihn dazu gebracht hat?</p>
+    <p style="margin-top:6px">&#8594; Welche der sechs Aktionen, die ihr gerade &#8222;genehmigt&#8220; habt, w&#228;ren heute strafbar?</p>
+    <p style="margin-top:6px">&#8594; Wie erkl&#228;rt ihr euch, dass &#8222;Rennfahrer&#8220; bereit war, einen Menschen t&#246;ten zu lassen?</p>
+    <p style="margin-top:6px">&#8594; Rennfahrers Frau &#8222;Ursula&#8220; wusste vermutlich nicht, f&#252;r wen sie arbeitete. Ist sie trotzdem schuldig?</p>
+  </div>
+  <button class="nbtn on outline" onclick="restart()">&#8635; Neu starten</button>
+</div>
+
+</div>
+<script>
+var SZ=[
+{date:'Berlin, 17. November 1970',az:'BStU 000202',cat:'Spitzel kontrollieren',cc:'ct',title:'Fall 1 // Warum arbeitet er für uns?',sub:'Stellungnahme zur bisherigen Arbeit',
+doc:'Die bisherige Zusammenarbeit seit Juli 1970 zeigt, da&#223; hier 2 entwicklungsf&#228;hige Werbungskandidaten gewonnen wurden.<br><br>Obgleich in ihrer Haltung eindeutig unterstrichen wird, da&#223; <em>politisch-ideologische Motive nicht die Grundlage ihres Handelns</em> darstellen, kann ihnen eine Aufgeschlossenheit gegen&#252;ber unseren wirtschaftlichen Verh&#228;ltnissen nicht aberkannt werden.<br><br>Als Motiv seines Handelns gibt er <em>die finanzielle Basis</em> an.',
+q:'Du überlegst, warum „Rennfahrer” für die Stasi arbeitet. Er glaubt nicht an den Kommunismus – er will Geld. Ist das ein Problem oder ein Vorteil?',
+cs:[
+{t:'A)  Kontakt beenden – wer nicht aus Überzeugung handelt, wird irgendwann unzuverlässig.',ok:false,fb:'Falsch gedacht. Die Stasi sah finanzielle Gründe oft als verlässlicher an als politische Überzeugung. Wer aus Überzeugung handelt, kann seine Meinung ändern – wer Geld braucht, bleibt berechenbar.'},
+{t:'B)  Weitermachen – wer aus Geldnot handelt, ist berechenbar und leichter zu steuern.',ok:true,fb:'So entschied die Stasi. „Rennfahrer” blieb fast 20 Jahre aktiv. Die Stasi zahlte ihm insgesamt 803.305 DM – und er lieferte zuverlässig, solange er bezahlt wurde.'},
+{t:'C)  Ihn politisch überzeugen – er soll lernen, die DDR gut zu finden.',ok:false,fb:'Zu aufwändig und unnötig. Die Stasi dachte praktisch: Ein gut bezahlter Spitzel braucht keine politische Überzeugung. Geld funktionierte besser als jede Schulung.'}
+]},
+{date:'Berlin, 10. Januar 1972',az:'BStU 000245',cat:'Informationen beschaffen',cc:'cb',title:'Fall 2 // Industriegeheimnisse',sub:'Betr.: Quelle „Berliner”',
+doc:'Die Aufnahme des Kontaktes zu „Berliner” erfolgte durch IM Rennfahrer anläßlich eines Besuches bei der Fa. Rühl.<br><br>Im Gespräch erfuhr Rennfahrer, daß B. zwar eine gut eingerichtete Wohnung habe, aber seine Verhältnisse ihm den Kauf eines Wagens nicht gestattet hätten.<br><br>Im Verlaufe des Gesprächs erklärte B. sich bereit, <em>Rezepturen für PUR-Systeme zu liefern</em> – Rezepturen der Bayer-AG, Leverkusen.',
+q:'&#8222;Rennfahrer&#8220; hat einen Ingenieur bei der Bayer-AG angeworben. Der Mann braucht Geld und bietet geheime Herstellungsformeln für Kunststoffe an. Wie gehst du vor?',
+cs:[
+{t:'A)  Sofort alle Formeln kaufen – wir brauchen das Material.',ok:false,fb:'Zu riskant. Die Stasi prüfte Material immer zuerst. Wer sofort zahlt, riskiert, wertlose oder gefälschte Informationen zu kaufen.'},
+{t:'B)  Erst prüfen, ob die Formeln wirklich nützlich sind – dann zahlen.',ok:true,fb:'Genau so stand es im Dokument: „Die Zahlung erfolgt nach erwiesener Brauchbarkeit.” So beschaffte die Stasi über Jahre Fabrikgeheimnisse aus dem Westen – günstig und mit wenig Risiko.'},
+{t:'C)  Ablehnen – Spionage bei Bayer ist zu gefährlich.',ok:false,fb:'Im Gegenteil: Geheime Fabrikformeln, vor allem aus der Chemie, waren für die DDR sehr wertvoll. Solche Informationen zu beschaffen war eines der Hauptziele der Stasi im Westen.'}
+]},
+{date:'Berlin, 10. Januar 1972',az:'BStU 000242',cat:'Material beschaffen',cc:'cp',title:'Fall 3 // Mission Nordirland',sub:'Betr.: Waffe und Munition',
+doc:'In der Zeit vom 17.–22.12.1971 weilten IM Rennfahrer und Diamant zur Beschaffung von Hartgummigeschoss-Waffen in England, Nordirland und der Republik Irland.<br><br>Das Vorhaben, in Nordirland mit britischen Soldaten zu verhandeln, mußte aufgegeben werden, da die Soldaten aus Angst vor Anschlägen keine unbekannten Personen an sich herankommen ließen.<br><br><em>Abschließende Bemerkung: Das Fehlen englischer Sprachkenntnisse bei beiden Mitarbeitern hat das Ergebnis der Reise sehr beeinträchtigt.</em>',
+q:'Der Einsatz scheitert. „Rennfahrer” und „Diamant” sollten in Nordirland Waffen kaufen – kein Englisch, kein Kontakt, kein Ergebnis. Sie kommen mit leeren Händen zurück. Wie reagierst du?',
+cs:[
+{t:'A)  Konsequenzen ziehen – wer einen Auftrag vermasselt, muss dafür geradestehen.',ok:false,fb:'Die Stasi reagierte nüchtern und praktisch. „Rennfahrer” blieb weiter im Einsatz. Das Scheitern wurde genau ausgewertet, damit beim nächsten Mal nichts schief geht.'},
+{t:'B)  Reisekosten erstatten, die gewonnenen Erkenntnisse auswerten, neuen Auftrag planen.',ok:true,fb:'Genau so handelte die Stasi. Auch ohne Waffen: Die Ortskenntnis über Belfast und die Informationen über britische Kontrollen wurden festgehalten. „Rennfahrer” blieb nützlich.'},
+{t:'C)  Den Spitzel selbst überlegen lassen, wie er den Auftrag nachholt.',ok:false,fb:'Die Stasi plante alle Einsätze selbst. Spitzel führten Aufträge aus – sie handelten nicht auf eigene Initiative, ohne Rücksprache mit ihrem zuständigen Stasi-Offizier.'}
+]},
+{date:'Berlin, 5. April 1975',az:'BStU 000026',cat:'Geheimoperation',cc:'cr',title:'Fall 4 // Einbruch',sub:'Einsatzplan: Besondere Maßnahme in Westberlin',
+doc:'Einsatz der IM: „Rennfahrer“ XV 1901/70 / „Karate“ XV 888/75<br>Einsatzort: Westberlin &middot; Zeit: 5./6.4.1975<br><br><em>Aufgabenstellung:</em> Sicherstellung operativer Materialien in der Wohnung eines Agenten des französischen Geheimdienstes.<br><br>Durchführung: ohne Schlüssel. „Rennfahrer“ übernimmt das Öffnen des Einstiegfensters mittels Schraubenzieher. Zeit: 23.00–02.00 Uhr.<br><br>Zu sichern: Reisepässe, Bankdokumente, Safe-Schlüssel, <em>Telefonverzeichnisse, Adressenkalender, Privatkorrespondenz.</em>',
+q:'Du sollst den Einsatzplan genehmigen. „Rennfahrer“ soll nachts in eine Westberliner Wohnung einbrechen – Ziel ist ein Agent des französischen Geheimdienstes. Genehmigst du den Einbruch?',
+cs:[
+{t:'A)  Ja – wichtiger Auftrag für die Stasi.',ok:true,fb:'Die Stasi genehmigte und führte genau solche Aktionen durch. Westdeutsche Gesetze galten für die Stasi nicht. Einbrüche auf westlichem Boden gehörten zum normalen Dienstbetrieb.'},
+{t:'B)  Nein – ein Einbruch im Westen ist eine Straftat und zu riskant.',ok:false,fb:'Die Stasi kannte keine solchen Grenzen. Einbrüche wie dieser – im Stasi-Jargon „besondere Maßnahmen” genannt – waren auch im Westen gängige Praxis.'},
+{t:'C)  Nur beobachten lassen – kein Einbruch.',ok:false,fb:'Die Stasi wollte konkrete Beweise: Pässe, Kontodaten, Adressbücher. Die ließen sich nur durch direkten Zugriff auf die Wohnung bekommen – nicht durch Beobachten von außen.'}
+]},
+{date:'o. D. (1975)',az:'BStU 000105',cat:'Neue Spitzel anwerben',cc:'ca',title:'Fall 5 // Das Kaffeeservice',sub:'Inoffizieller Vorschlag von „Cairo“ an „Hans“',
+doc:'Hans,<br><br>ich würde vorschlagen, der Frau Rennfahrers, <span class="redact">Ursula &#9608;&#9608;&#9608;&#9608;&#9608;&#9608;</span>, bei passender Gelegenheit eine Anerkennung zukommen zu lassen.<br><br>Die Begründung: Sie hilft ihrem Mann bei seiner operativen Tätigkeit. <em>Sie fährt den Wagen, während er die Briefe einwirft.</em> Weiterhin besorgt sie den Empfang der Funknachrichten. Er berührt nicht die Code-Unterlagen, um seine Fingerabdrücke nicht zu hinterlassen.<br><br>Bei einer Anerkennung brauchte es sich nicht um größere Westmarkbeträge handeln. <em>Ein schönes Kaffeeservice aus Meißner Porzellan würde große Freude auslösen.</em>',
+q:'Rennfahrers Frau hilft ihm bei seinen Einsätzen – sie fährt ihn, empfängt Nachrichten – vermutlich ohne zu wissen, für wen. Kollege „Cairo” schlägt vor, ihr ein Meißner Porzellan-Kaffeeservice zu schenken. Was tust du?',
+cs:[
+{t:'A)  Kleines Geschenk genehmigen – billiger Weg, sie bei der Sache zu halten.',ok:true,fb:'Die Stasi stimmte zu. „Ursula” fuhr den Wagen, empfing verschlüsselte Nachrichten, berührte Geheimunterlagen. Ein Kaffeeservice sicherte ihre Mithilfe – ohne sie offiziell als Spitzel anwerben zu müssen.'},
+{t:'B)  Sie offiziell als Stasi-Spitzel anwerben und fest bezahlen.',ok:false,fb:'Zu riskant: Sie hätte Nein sagen können. Ihr Unwissen war ein Vorteil. Wer nicht weiß, dass er für die Stasi arbeitet, kann weder ablehnen noch jemanden verraten.'},
+{t:'C)  Nichts tun – sie hilft von selbst, kein Eingreifen nötig.',ok:false,fb:'Die Stasi pflegte alle nützlichen Kontakte mit Bedacht. Kleine Aufmerksamkeiten sorgten für Treue und verhinderten, dass Menschen anfingen nachzufragen.'}
+]},
+{date:'1974 (Einleitungstext der Themenmappe)',az:'Themenmappe 4, S. 1',cat:'Geheimoperation',cc:'cr',title:'Fall 6 // Der Mordauftrag',sub:'Hintergrundtext aus der Themenmappe',
+doc:'Aus dem Einleitungstext der Themenmappe zum IM „Rennfahrer“:<br><br><em>„Als der stellvertretende MfS-Minister 1974 die Tötung eines Menschen befahl, der dem MfS ein Dorn im Auge war, erklärte sich „Rennfahrer“ zusammen mit seinem Mitarbeiter IM „Karate“, Jahrgang 1922, auch dazu bereit.“</em><br><br>Der Tötungsauftrag wurde letztlich nicht ausgeführt.',
+q:'Der stellvertretende Stasi-Minister befiehlt, einen Mann töten zu lassen, der der Stasi gefährlich wird. Du fragst „Rennfahrer” und „Karate”, ob sie bereit sind. Was sagen sie?',
+cs:[
+{t:'A)  Beide erklären sich bereit.',ok:true,fb:'Genau das geschah. Der Auftrag wurde zwar am Ende nicht ausgeführt – aber die erklärte Bereitschaft zum Mord war der Grund, warum „Rennfahrer” 1993 auch wegen versuchten Mordes verurteilt wurde.'},
+{t:'B)  Beide weigern sich – das ist eine Grenze, die sie nicht überschreiten.',ok:false,fb:'In Wirklichkeit lehnten weder „Rennfahrer” noch „Karate” ab. Nach Jahren der finanziellen Abhängigkeit und immer schlimmerer Aufträge hatten sie diese Grenze längst überschritten.'},
+{t:'C)  Sie wollen erst nachdenken und stellen Bedingungen.',ok:false,fb:'Es gab keine Verhandlung. Beide sagten sofort zu. Die Stasi hatte beide über Jahre so tief in ihr Netz eingebunden, dass solche Aufträge ohne Zögern angenommen wurden.'}
+]}
+];
+
+var cur=0,sc=0,done=false;
+function G(id){return document.getElementById(id);}
+function show(id){
+  document.querySelectorAll('.screen').forEach(function(s){s.classList.remove('on');});
+  G(id).classList.add('on');
+  window.scrollTo(0,0);
+}
+function startGame(){cur=0;sc=0;done=false;show('sg');render();}
+function render(){
+  var s=SZ[cur];done=false;
+  G('pf').style.width=(cur/SZ.length*100)+'%';
+  G('fl').textContent='Fall '+(cur+1)+' von '+SZ.length;
+  G('sd').textContent=sc+' / '+SZ.length;
+  G('cl').textContent=s.cat;
+  G('cbw').innerHTML='<span class="cat '+s.cc+'">'+s.cat+'</span>';
+  G('st').textContent=s.title;
+  G('dd').textContent=s.date;
+  G('dz').textContent=s.az;
+  G('ds').textContent=s.sub;
+  G('dt').innerHTML=s.doc;
+  G('qt').textContent=s.q;
+  var ch=G('ch');ch.innerHTML='';
+  s.cs.forEach(function(c,i){
+    var b=document.createElement('button');
+    b.className='cbtn';b.textContent=c.t;
+    b.onclick=function(){pick(i);};
+    ch.appendChild(b);
+  });
+  G('fb').className='fb';G('fb').textContent='';
+  var nb=G('nb');nb.className='nbtn';
+  nb.textContent=cur===SZ.length-1?'Auflösung anzeigen →':'Weiter →';
+}
+function pick(i){
+  if(done)return;done=true;
+  var s=SZ[cur],c=s.cs[i];
+  document.querySelectorAll('.cbtn').forEach(function(b,j){
+    b.disabled=true;
+    if(s.cs[j].ok)b.classList.add('ok');
+    else if(j===i)b.classList.add('no');
+  });
+  if(c.ok)sc++;
+  var fb=G('fb');
+  fb.className='fb on '+(c.ok?'ok':'no');
+  fb.textContent=(c.ok?'✓ ':'✗ ')+c.fb;
+  G('sd').textContent=sc+' / '+SZ.length;
+  G('nb').classList.add('on');
+}
+function step(){
+  cur++;
+  if(cur>=SZ.length){showResult();}else{render();window.scrollTo(0,0);}
+}
+function showResult(){
+  show('sr');
+  G('fs').textContent=sc+'/6';
+  var coms=[
+    'Du denkst noch wie ein normaler Mensch – nicht wie die Stasi.',
+    'Zu wenig. Ein echter Stasi-Offizier hätte kühler kalkuliert.',
+    'Mittelmaß. Du hast Ansätze, aber auch einige blinde Stellen.',
+    'Gute Arbeit. Du hast verstanden, wie die Stasi dachte.',
+    'Sehr gut. Du hättest ein effizienter Stasi-Offizier sein können.',
+    'Ausgezeichnet. Eine beunruhigende Leistung.',
+    'Perfekt. Eine erschreckende Leistung.'
+  ];
+  G('sc2').textContent=coms[sc]||coms[3];
+}
+function restart(){show('s0');}
+</script>
+</body>
+</html>
